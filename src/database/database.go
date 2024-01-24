@@ -20,6 +20,6 @@ func Conect() (*sql.DB, error) {
 		db.Close()
 		return nil, err
 	}
-	fmt.Printf("Connect")
+
 	return db, nil
 }

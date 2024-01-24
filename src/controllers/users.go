@@ -1,34 +1,47 @@
 package controllers
 
 import (
-	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/dauid64/super_chat_backend/src/database"
+	"github.com/dauid64/super_chat_backend/src/models"
+	"github.com/dauid64/super_chat_backend/src/responses"
 )
 
 func SearchUsers(w http.ResponseWriter, r *http.Request) {
-	_, err := database.Conect()
+	db, err := database.Conect()
+
 	if err != nil {
-		log.Fatal(err)
+		responses.Erro(w, http.StatusInternalServerError, err)
+		return
+	}
+	defer db.Close()
+
+	lines, err := db.Query("SELECT id, email, password FROM users")
+
+	if err != nil {
+		responses.Erro(w, http.StatusInternalServerError, err)
+		return
 	}
 
-	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
+	var users []models.User
 
-		err := json.NewEncoder(w).Encode(struct {
-			Erro string `json:"erro"`
-		}{
-			Erro: err.Error(),
-		})
+	for lines.Next() {
+		var user models.User
+
+		err = lines.Scan(
+			&user.ID,
+			&user.Email,
+			&user.Password,
+		)
+
 		if err != nil {
-			log.Fatal(err)
+			responses.Erro(w, http.StatusInternalServerError, err)
+			return
 		}
+
+		users = append(users, user)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	err = json.NewEncoder(w).Encode("Conectado!")
+	responses.JSON(w, http.StatusOK, users)
 }
