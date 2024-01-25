@@ -32,6 +32,8 @@ func SearchUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
+	responses.EnableCors(&w)
+
 	BodyRequest, err := io.ReadAll(r.Body)
 	if err != nil {
 		responses.Erro(w, http.StatusUnprocessableEntity, err)
@@ -58,13 +60,15 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer db.Close()
-
+	
 	repositorie := repositories.NewRepositorieOfUsers(db)
 	user.ID, err = repositorie.Create(user)
 	if err != nil {
 		responses.Erro(w, http.StatusInternalServerError, err)
+
 		return
 	}
+
 
 	responses.JSON(w, http.StatusCreated, user)
 }

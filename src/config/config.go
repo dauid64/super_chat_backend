@@ -14,6 +14,8 @@ var (
 	Port = 0
 
 	DataBaseSourceName = ""
+
+	FrontEndUrl = ""
 )
 
 func Carregar() {
@@ -34,4 +36,6 @@ func Carregar() {
 		os.Getenv("POSTGRES_PASSWORD"), 
 		os.Getenv("POSTGRES_DB"),
 	)
+
+	FrontEndUrl = os.Getenv("FRONTEND_URL")
 }
