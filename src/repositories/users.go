@@ -40,3 +40,22 @@ func (repositorie Users) All() ([]models.User, error){
 
 	return users, nil
 }
+
+func (respositorie Users) Create(user models.User) (uint64, error) {
+	statement, err := respositorie.db.Prepare(
+		"INSERT INTO users (email, password) VALUES($1, $2) RETURNING id",
+	)
+	if err != nil {
+		return 0, err
+	}
+	defer statement.Close()
+
+	var lastInsertId uint64
+
+	err = statement.QueryRow(user.Email, user.Password).Scan(&lastInsertId)
+	if err != nil {
+		return 0, err
+	}
+
+	return uint64(lastInsertId), nil
+}

@@ -13,4 +13,10 @@ var UsersRouters = []Router{
 		Func:          controllers.SearchUsers,
 		isAutenticate: false,
 	},
+	{
+		URI:           "/usuarios",
+		Method:        http.MethodPost,
+		Func:          controllers.CreateUser,
+		isAutenticate: false,
+	},
 }
