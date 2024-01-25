@@ -88,3 +88,23 @@ func checkEmailExist(repositorie Users, email string) (bool, error) {
 
 	return false, nil
 }
+
+func (repositorie Users) SearchEmail(email string) (models.User, error) {
+	line, err := repositorie.db.Query(
+		"SELECT id, password FROM users WHERE email=$1", email,
+	)
+	if err != nil {
+		return models.User{}, err
+	}
+	defer line.Close()
+
+	var user models.User
+
+	if line.Next() {
+		if err = line.Scan(&user.ID, &user.Password); err != nil {
+			return models.User{}, err
+		}
+	}
+
+	return user, nil
+}

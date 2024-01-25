@@ -13,9 +13,14 @@ var (
 	// Porta onde a API vai estar rodando
 	Port = 0
 
+	// String de conexão com o Postgres
 	DataBaseSourceName = ""
 
+	// Url autorizada a realizar consultas CORS
 	FrontEndUrl = ""
+
+	// SecretKey é a chave que vai ser usada para assinar o token
+	SecretKey []byte
 )
 
 func Carregar() {
@@ -38,4 +43,6 @@ func Carregar() {
 	)
 
 	FrontEndUrl = os.Getenv("FRONTEND_URL")
+
+	SecretKey = []byte(os.Getenv("SECRET_KEY"))
 }
