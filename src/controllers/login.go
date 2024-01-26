@@ -48,5 +48,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	userID := strconv.FormatUint(uint64(userSavedDataBase.ID), 10)
+
 	responses.JSON(w, http.StatusOK, models.AuthenticationData{ID: userID, Token: token})
 }
