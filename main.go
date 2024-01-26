@@ -6,13 +6,17 @@ import (
 	"net/http"
 
 	"github.com/dauid64/super_chat_backend/src/config"
+	"github.com/dauid64/super_chat_backend/src/database"
 	"github.com/dauid64/super_chat_backend/src/router"
 )
 
 func main() {
-	config.Carregar()
-	r := router.Generate()
+	config.LoadEnvironment()
 
-	fmt.Printf("Escutando na porta %d\n", config.Port)
+	database.Conect()
+	database.Migrate()
+
+	r := router.Generate()
+	log.Printf("Escutando na porta %d\n", config.Port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", config.Port), r))
 }

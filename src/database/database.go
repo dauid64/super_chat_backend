@@ -1,24 +1,28 @@
 package database
 
 import (
-	"database/sql"
+	"log"
 
 	"github.com/dauid64/super_chat_backend/src/config"
+	"github.com/dauid64/super_chat_backend/src/models"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
+var Instance *gorm.DB
+var dbError error
+
 // Conectar abre a conexão com o banco de dados e a retorna
-func Conect() (*sql.DB, error) {
-	db, err := sql.Open("postgres", config.DataBaseSourceName)
-
-	if err != nil {
-		return nil, err
+func Conect() {
+	Instance, dbError = gorm.Open(postgres.Open(config.DataBaseSourceName), &gorm.Config{})
+	if dbError != nil {
+		log.Fatal(dbError)
 	}
 
-	err = db.Ping()
-	if err != nil {
-		db.Close()
-		return nil, err
-	}
+	log.Println("Connected to Database!")
+}
 
-	return db, nil
+func Migrate() {
+	Instance.AutoMigrate(&models.User{})
+	log.Println("Database Migrations Completed!")
 }

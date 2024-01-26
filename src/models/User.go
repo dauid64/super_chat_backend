@@ -5,11 +5,12 @@ import (
 	"strings"
 
 	"github.com/dauid64/super_chat_backend/src/security"
+	"gorm.io/gorm"
 )
 
 type User struct {
-	ID uint64 `json:"id,omitempty"`
-	Email string `json:"email,omitempty"`
+	gorm.Model
+	Email string `json:"email,omitempty" gorm:"unique"`
 	Password string `json:"password,omitempty"`
 }
 

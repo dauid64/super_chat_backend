@@ -8,7 +8,7 @@ import (
 
 var LoginRouter = Router{
 	URI:    "/login",
-	Method: http.MethodGet,
+	Method: http.MethodPost,
 	Func: controllers.Login,
 	isAutenticate: false,
 }

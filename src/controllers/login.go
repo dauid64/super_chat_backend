@@ -10,12 +10,13 @@ import (
 	"github.com/dauid64/super_chat_backend/src/authetication"
 	"github.com/dauid64/super_chat_backend/src/database"
 	"github.com/dauid64/super_chat_backend/src/models"
-	"github.com/dauid64/super_chat_backend/src/repositories"
 	"github.com/dauid64/super_chat_backend/src/responses"
 	"github.com/dauid64/super_chat_backend/src/security"
 )
 
 func Login(w http.ResponseWriter, r *http.Request) {
+	responses.EnableCors(&w)
+
 	bodyRequest, err := io.ReadAll(r.Body)
 	if err != nil {
 		responses.Erro(w, http.StatusUnprocessableEntity, err)
@@ -28,32 +29,26 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db, err := database.Conect()
+	var userSavedDataBase models.User
+	record := database.Instance.Where("email = ?", user.Email).First(&userSavedDataBase)
+	if record.Error != nil {
+		responses.JSON(w, http.StatusInternalServerError, errors.New("Credenciais Inválidas"))
+		return
+	}
+
+	err = security.CheckPassword(user.Password, userSavedDataBase.Password)
 	if err != nil {
-		responses.Erro(w, http.StatusInternalServerError, err)
+		responses.Erro(w, http.StatusUnauthorized, err)
 		return
 	}
-	defer db.Close()
 
-	repositorie := repositories.NewRepositorieOfUsers(db)
-	userSalvedDataBase, err := repositorie.SearchEmail(user.Email)
+	token, erro := authetication.CreateToken(uint64(userSavedDataBase.ID))
 	if err != nil {
-		responses.Erro(w, http.StatusInternalServerError, errors.New("Esse e-mail não foi cadastrado"))
+		responses.Erro(w, http.StatusInternalServerError, erro)
 		return
 	}
 
-	if err = security.CheckPassword(user.Password, userSalvedDataBase.Password); err != nil {
-		responses.Erro(w, http.StatusInternalServerError, errors.New("Senha inválida"))
-		return
-	}
-
-	token, err := authetication.CreateToken(userSalvedDataBase.ID)
-	if err != nil {
-		responses.Erro(w, http.StatusInternalServerError, err)
-		return
-	}
-
-	userID := strconv.FormatUint(userSalvedDataBase.ID, 10)
+	userID := strconv.FormatUint(uint64(userSavedDataBase.ID), 10)
 
 	responses.JSON(w, http.StatusOK, models.AuthenticationData{ID: userID, Token: token})
 }

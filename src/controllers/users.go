@@ -8,23 +8,19 @@ import (
 	"github.com/dauid64/super_chat_backend/src/database"
 	"github.com/dauid64/super_chat_backend/src/models"
 
-	"github.com/dauid64/super_chat_backend/src/repositories"
 	"github.com/dauid64/super_chat_backend/src/responses"
 )
 
 func SearchUsers(w http.ResponseWriter, r *http.Request) {
-	db, err := database.Conect()
+	var users []models.User
 
-	if err != nil {
-		responses.Erro(w, http.StatusInternalServerError, err)
+	record := database.Instance.Find(&users)
+	if record.Error != nil {
+		responses.Erro(w, http.StatusInternalServerError, record.Error)
 		return
 	}
-	defer db.Close()
-
-	repositorie := repositories.NewRepositorieOfUsers(db)
-	users, err := repositorie.All()
-	if err != nil {
-		responses.Erro(w, http.StatusInternalServerError, err)
+	if record.Error != nil {
+		responses.Erro(w, http.StatusInternalServerError, record.Error)
 		return
 	}
 
@@ -53,22 +49,11 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db, err := database.Conect()
-
-	if err != nil {
-		responses.Erro(w, http.StatusInternalServerError, err)
+	record := database.Instance.Create(&user)
+	if record.Error != nil {
+		responses.Erro(w, http.StatusInternalServerError, record.Error)
 		return
 	}
-	defer db.Close()
-	
-	repositorie := repositories.NewRepositorieOfUsers(db)
-	user.ID, err = repositorie.Create(user)
-	if err != nil {
-		responses.Erro(w, http.StatusInternalServerError, err)
-
-		return
-	}
-
 
 	responses.JSON(w, http.StatusCreated, user)
 }

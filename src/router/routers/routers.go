@@ -3,6 +3,7 @@ package routers
 import (
 	"net/http"
 
+	"github.com/dauid64/super_chat_backend/src/middlewares"
 	"github.com/gorilla/mux"
 )
 
@@ -18,7 +19,12 @@ func Configurate(r *mux.Router) *mux.Router {
 	routers = append(routers, LoginRouter)
 	
 	for _, router := range routers {
-		r.HandleFunc(router.URI, router.Func).Methods(router.Method)
+		if router.isAutenticate {
+			r.HandleFunc(router.URI, middlewares.Logger(middlewares.Authenticate(router.Func)),
+			).Methods(router.Method)
+		} else {
+			r.HandleFunc(router.URI, middlewares.Logger(router.Func)).Methods(router.Method)
+		}
 	}
 
 	return r
