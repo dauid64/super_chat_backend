@@ -19,4 +19,10 @@ var UsersRouters = []Router{
 		Func:          controllers.CreateUser,
 		isAutenticate: false,
 	},
+	{
+		URI: "recuperar/usuario",
+		Method: http.MethodGet,
+		Func: controllers.RecoverUser,
+		isAutenticate: true,
+	},
 }

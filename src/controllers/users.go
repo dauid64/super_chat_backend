@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/dauid64/super_chat_backend/src/authetication"
 	"github.com/dauid64/super_chat_backend/src/database"
 	"github.com/dauid64/super_chat_backend/src/models"
 
@@ -15,10 +16,6 @@ func SearchUsers(w http.ResponseWriter, r *http.Request) {
 	var users []models.User
 
 	record := database.Instance.Find(&users)
-	if record.Error != nil {
-		responses.Erro(w, http.StatusInternalServerError, record.Error)
-		return
-	}
 	if record.Error != nil {
 		responses.Erro(w, http.StatusInternalServerError, record.Error)
 		return
@@ -56,4 +53,22 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	responses.JSON(w, http.StatusCreated, user)
+}
+
+func RecoverUser(w http.ResponseWriter, r *http.Request) {
+	responses.EnableCors(&w)
+	userIDInToken, erro := authetication.ExtractUserID(r)
+	if erro != nil {
+		responses.Erro(w, http.StatusUnauthorized, erro)
+		return
+	}
+
+	var user models.User
+	record := database.Instance.First(&user, "id = ?", userIDInToken)
+	if record.Error != nil {
+		responses.Erro(w, http.StatusInternalServerError, record.Error)
+		return
+	}
+
+	responses.JSON(w, http.StatusOK, user)
 }
