@@ -61,15 +61,11 @@ func RecoverUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var user models.User
-	record := database.Instance.First(&user, "id = ?", userIDInToken)
+	record := database.Instance.Select("created_at", "email").First(&user, "id = ?", userIDInToken)
 	if record.Error != nil {
 		responses.Erro(w, http.StatusInternalServerError, record.Error)
 		return
 	}
 
 	responses.JSON(w, http.StatusOK, user)
-}
-
-func PrepareRecoverUser(w http.ResponseWriter, r *http.Request) {
-	responses.JSON(w, http.StatusNoContent, nil)
 }

@@ -26,11 +26,21 @@ func Authenticate(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func SetCors(next http.HandlerFunc) http.HandlerFunc {
+func CorsHandler(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", config.FrontEndUrl)
-		w.Header().Set("Access-Control-Allow-Headers", "authorization,content-type")
-		w.Header().Set("Access-Control-Allow-Methods", "POST, PUT, PATCH, GET, DELETE, OPTIONS")
-		next(w, r)
+		if (r.Method == "OPTIONS") {
+			log.Print("preflight detected: ", r.Header)
+			w.Header().Add("Connection", "keep-alive") 			
+			w.Header().Add("Access-Control-Allow-Origin", "http://localhost:3000") 			
+			w.Header().Add("Access-Control-Allow-Methods", "POST, OPTIONS, GET, DELETE, PUT") 			
+			w.Header().Add("Access-Control-Allow-Headers", "content-type") 			
+			w.Header().Add("Access-Control-Max-Age", "86400")
+			w.WriteHeader(http.StatusOK)
+		} else {
+			w.Header().Set("Access-Control-Allow-Origin", config.FrontEndUrl)
+			w.Header().Set("Access-Control-Allow-Headers", "authorization,content-type")
+			w.Header().Set("Access-Control-Allow-Methods", "POST, PUT, PATCH, GET, DELETE, OPTIONS")
+			next(w, r)
+		}	
 	}
 }

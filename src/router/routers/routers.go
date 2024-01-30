@@ -20,10 +20,10 @@ func Configurate(r *mux.Router) *mux.Router {
 	
 	for _, router := range routers {
 		if router.isAutenticate {
-			r.HandleFunc(router.URI, middlewares.SetCors(middlewares.Logger(middlewares.Authenticate(router.Func))),
+			r.HandleFunc(router.URI, middlewares.CorsHandler(middlewares.Logger(middlewares.Authenticate(router.Func))),
 			).Methods(router.Method)
 		} else {
-			r.HandleFunc(router.URI, middlewares.SetCors(middlewares.Logger(router.Func))).Methods(router.Method)
+			r.HandleFunc(router.URI, middlewares.CorsHandler(middlewares.Logger(router.Func))).Methods(router.Method)
 		}
 	}
 
