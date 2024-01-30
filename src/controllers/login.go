@@ -5,7 +5,6 @@ import (
 	"errors"
 	"io"
 	"net/http"
-	"strconv"
 
 	"github.com/dauid64/super_chat_backend/src/authetication"
 	"github.com/dauid64/super_chat_backend/src/database"
@@ -15,8 +14,6 @@ import (
 )
 
 func Login(w http.ResponseWriter, r *http.Request) {
-	responses.EnableCors(&w)
-
 	bodyRequest, err := io.ReadAll(r.Body)
 	if err != nil {
 		responses.Erro(w, http.StatusUnprocessableEntity, err)

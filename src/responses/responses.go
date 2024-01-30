@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-
-	"github.com/dauid64/super_chat_backend/src/config"
 )
 
 
@@ -27,8 +25,4 @@ func Erro(w http.ResponseWriter, statusCode int, err error) {
 	}{
 		Erro: err.Error(),
 	})
-}
-
-func EnableCors(w *http.ResponseWriter) {
-	(*w).Header().Set("Access-Control-Allow-Origin", config.FrontEndUrl)
 }

@@ -25,8 +25,6 @@ func SearchUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
-	responses.EnableCors(&w)
-
 	BodyRequest, err := io.ReadAll(r.Body)
 	if err != nil {
 		responses.Erro(w, http.StatusUnprocessableEntity, err)
@@ -56,7 +54,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func RecoverUser(w http.ResponseWriter, r *http.Request) {
-	responses.EnableCors(&w)
 	userIDInToken, erro := authetication.ExtractUserID(r)
 	if erro != nil {
 		responses.Erro(w, http.StatusUnauthorized, erro)
@@ -71,4 +68,8 @@ func RecoverUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	responses.JSON(w, http.StatusOK, user)
+}
+
+func PrepareRecoverUser(w http.ResponseWriter, r *http.Request) {
+	responses.JSON(w, http.StatusNoContent, nil)
 }

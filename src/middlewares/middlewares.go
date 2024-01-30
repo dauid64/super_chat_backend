@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/dauid64/super_chat_backend/src/authetication"
+	"github.com/dauid64/super_chat_backend/src/config"
 	"github.com/dauid64/super_chat_backend/src/responses"
 )
 
@@ -21,6 +22,15 @@ func Authenticate(next http.HandlerFunc) http.HandlerFunc {
 			responses.Erro(w, http.StatusUnauthorized, err)
 			return
 		}
+		next(w, r)
+	}
+}
+
+func SetCors(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", config.FrontEndUrl)
+		w.Header().Set("Access-Control-Allow-Headers", "authorization,content-type")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, PUT, PATCH, GET, DELETE, OPTIONS")
 		next(w, r)
 	}
 }
