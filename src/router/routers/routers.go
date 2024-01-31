@@ -17,6 +17,7 @@ type Router struct {
 func Configurate(r *mux.Router) *mux.Router {
 	routers := UsersRouters
 	routers = append(routers, LoginRouter)
+	routers = append(routers, MessagesRouters...)
 	
 	for _, router := range routers {
 		if router.isAutenticate {

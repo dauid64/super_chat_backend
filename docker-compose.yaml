@@ -17,6 +17,9 @@ services:
       - 15432:80
     depends_on:
       - superchat_db
+    volumes:
+      - supercht_pgadmin_data:/var/lib/pgadmin
     
 volumes:
   superchat_postgres_data:
+  supercht_pgadmin_data:

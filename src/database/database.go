@@ -23,6 +23,6 @@ func Conect() {
 }
 
 func Migrate() {
-	Instance.AutoMigrate(&models.User{})
+	Instance.AutoMigrate(&models.User{}, &models.Message{})
 	log.Println("Database Migrations Completed!")
 }
