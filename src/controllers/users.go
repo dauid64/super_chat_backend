@@ -25,14 +25,14 @@ func SearchUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
-	BodyRequest, err := io.ReadAll(r.Body)
+	bodyRequest, err := io.ReadAll(r.Body)
 	if err != nil {
 		responses.Erro(w, http.StatusUnprocessableEntity, err)
 		return
 	}
 
 	var user models.User
-	err = json.Unmarshal(BodyRequest, &user)
+	err = json.Unmarshal(bodyRequest, &user)
 	if err != nil {
 		responses.Erro(w, http.StatusBadRequest, err)
 		return
