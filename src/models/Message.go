@@ -8,6 +8,6 @@ type Message struct {
 	ToUserID uint `json:"toUserID,omitempty"`
 	FromUserID uint `json:"fromUserID,omitempty"`
 
-	ToUser User `json:"toUser,omitempty" gorm:"foreignKey:ToUserID"`
-	FromUser User `json:"romUser,omitempty" gorm:"foreignKey:FromUserID"`
+	ToUser User `json:"toUser,omitempty" gorm:"foreignKey:ToUserID;constraint:OnDelete:SET NULL;"`
+	FromUser User `json:"fromUser,omitempty" gorm:"foreignKey:FromUserID;constraint:OnDelete:CASCADE;"`
 }

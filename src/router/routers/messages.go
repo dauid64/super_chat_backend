@@ -13,4 +13,10 @@ var MessagesRouters = []Router{
 		Func: controllers.CreateMessage,
 		isAutenticate: true,
 	},
+	{
+		URI: "/mensagens",
+		Method: http.MethodGet,
+		Func: controllers.GetMessagesChat,
+		isAutenticate: true,
+	},
 }
