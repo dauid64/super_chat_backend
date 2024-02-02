@@ -2,10 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
-	"sync"
+	"strconv"
 
+	"github.com/dauid64/super_chat_backend/src/authetication"
 	"github.com/dauid64/super_chat_backend/src/database"
 	"github.com/dauid64/super_chat_backend/src/models"
 	"github.com/dauid64/super_chat_backend/src/responses"
@@ -35,41 +37,37 @@ func CreateMessage(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetMessagesChat(w http.ResponseWriter, r *http.Request) {
-	fromUserID := r.URL.Query().Get("fromuser")
-	toUserID := r.URL.Query().Get("touser")
-
-	var messagesFromUser []models.Message
-	var messsagesToUser []models.Message
-
-	var waitGroup sync.WaitGroup
-	waitGroup.Add(2)
-
-	go func() {
-		record := database.Instance.Joins("ToUser").Joins("FromUser").Find(&messagesFromUser, "messages.from_user_id = ?", fromUserID)
-		if record.Error != nil {
-			responses.Erro(w, http.StatusInternalServerError, record.Error)
-		}
-		waitGroup.Done()
-	}()
-
-	go func() {
-		record := database.Instance.Joins("FromUser").Joins("ToUser").Find(&messsagesToUser, "messages.to_user_id = ?", toUserID)
-		if record.Error != nil {
-			responses.Erro(w, http.StatusInternalServerError, record.Error)
-		}
-		waitGroup.Done()
-	}()
-
-	waitGroup.Wait()
-
-	type messagesData struct {
-		FromMessages []models.Message `json:"fromMessages,omitempty"`
-		ToMessages []models.Message	`json:"toMessages,omitempty"`
-	}
-	messagesResponse := messagesData{
-		messagesFromUser,
-		messsagesToUser,
+	usuarioID, err := authetication.ExtractUserID(r)
+	if err != nil {
+		responses.Erro(w, http.StatusUnauthorized, err)
+		return
 	}
 
-	responses.JSON(w, http.StatusOK, messagesResponse)
+	fromUserID, err := strconv.ParseUint(r.URL.Query().Get("fromuser"), 10, 64)
+	if err != nil {
+		responses.Erro(w, http.StatusBadRequest, err)
+		return
+	}
+	toUserID, err := strconv.ParseUint(r.URL.Query().Get("touser"), 10, 64)
+	if err != nil {
+		responses.Erro(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if usuarioID != fromUserID {
+		responses.Erro(w, http.StatusForbidden, errors.New("Você não tem permissão para acessar essa conversa"))
+		return
+	}
+
+	var messages []models.Message
+
+	record := database.Instance.Joins(
+		"ToUser").Joins("FromUser").Where(
+		"messages.from_user_id IN ? AND messages.to_user_id IN ?", []uint64{fromUserID, toUserID}, []uint64{fromUserID, toUserID},
+	).Order("created_at ASC").Find(&messages)
+	if record.Error != nil {
+		responses.Erro(w, http.StatusInternalServerError, record.Error)
+	}
+
+	responses.JSON(w, http.StatusOK, messages)
 }
