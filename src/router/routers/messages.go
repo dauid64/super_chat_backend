@@ -14,7 +14,7 @@ var MessagesRouters = []Router{
 		isAutenticate: true,
 	},
 	{
-		URI: "/mensagens",
+		URI: "/mensagens/{touser}",
 		Method: http.MethodGet,
 		Func: controllers.GetMessagesChat,
 		isAutenticate: true,

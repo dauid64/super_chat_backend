@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"errors"
 	"io"
 	"net/http"
 	"strconv"
@@ -11,6 +10,7 @@ import (
 	"github.com/dauid64/super_chat_backend/src/database"
 	"github.com/dauid64/super_chat_backend/src/models"
 	"github.com/dauid64/super_chat_backend/src/responses"
+	"github.com/gorilla/mux"
 )
 
 func CreateMessage(w http.ResponseWriter, r *http.Request) {
@@ -37,25 +37,17 @@ func CreateMessage(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetMessagesChat(w http.ResponseWriter, r *http.Request) {
+	param := mux.Vars(r)
+
 	usuarioID, err := authetication.ExtractUserID(r)
 	if err != nil {
 		responses.Erro(w, http.StatusUnauthorized, err)
 		return
 	}
 
-	fromUserID, err := strconv.ParseUint(r.URL.Query().Get("fromuser"), 10, 64)
+	toUserID, err := strconv.ParseUint(param["touser"], 10, 64)
 	if err != nil {
 		responses.Erro(w, http.StatusBadRequest, err)
-		return
-	}
-	toUserID, err := strconv.ParseUint(r.URL.Query().Get("touser"), 10, 64)
-	if err != nil {
-		responses.Erro(w, http.StatusBadRequest, err)
-		return
-	}
-
-	if usuarioID != fromUserID {
-		responses.Erro(w, http.StatusForbidden, errors.New("Você não tem permissão para acessar essa conversa"))
 		return
 	}
 
@@ -63,7 +55,7 @@ func GetMessagesChat(w http.ResponseWriter, r *http.Request) {
 
 	record := database.Instance.Joins(
 		"ToUser").Joins("FromUser").Where(
-		"messages.from_user_id IN ? AND messages.to_user_id IN ?", []uint64{fromUserID, toUserID}, []uint64{fromUserID, toUserID},
+		"messages.from_user_id IN ? AND messages.to_user_id IN ?", []uint64{usuarioID, toUserID}, []uint64{usuarioID, toUserID},
 	).Order("created_at ASC").Find(&messages)
 	if record.Error != nil {
 		responses.Erro(w, http.StatusInternalServerError, record.Error)
