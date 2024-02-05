@@ -14,6 +14,12 @@ import (
 )
 
 func CreateMessage(w http.ResponseWriter, r *http.Request) {
+	userID, err := authetication.ExtractUserID(r)
+	if err != nil {
+		responses.Erro(w, http.StatusUnauthorized, err)
+		return
+	}
+
 	bodyRequest, err := io.ReadAll(r.Body)
 	if err != nil {
 		responses.Erro(w, http.StatusUnprocessableEntity, err)
@@ -27,6 +33,8 @@ func CreateMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	message.FromUserID = uint(userID)
+
 	record := database.Instance.Create(&message)
 	if record.Error != nil {
 		responses.Erro(w, http.StatusInternalServerError, record.Error)
@@ -39,7 +47,7 @@ func CreateMessage(w http.ResponseWriter, r *http.Request) {
 func GetMessagesChat(w http.ResponseWriter, r *http.Request) {
 	param := mux.Vars(r)
 
-	usuarioID, err := authetication.ExtractUserID(r)
+	userID, err := authetication.ExtractUserID(r)
 	if err != nil {
 		responses.Erro(w, http.StatusUnauthorized, err)
 		return
@@ -55,7 +63,7 @@ func GetMessagesChat(w http.ResponseWriter, r *http.Request) {
 
 	record := database.Instance.Joins(
 		"ToUser").Joins("FromUser").Where(
-		"messages.from_user_id IN ? AND messages.to_user_id IN ?", []uint64{usuarioID, toUserID}, []uint64{usuarioID, toUserID},
+		"messages.from_user_id IN ? AND messages.to_user_id IN ?", []uint64{userID, toUserID}, []uint64{userID, toUserID},
 	).Order("created_at ASC").Find(&messages)
 	if record.Error != nil {
 		responses.Erro(w, http.StatusInternalServerError, record.Error)
