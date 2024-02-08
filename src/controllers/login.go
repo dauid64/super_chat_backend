@@ -45,5 +45,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user.ID = userSavedDataBase.ID
+
 	responses.JSON(w, http.StatusOK, models.AuthenticationData{User: user, Token: token})
 }
