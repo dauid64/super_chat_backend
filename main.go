@@ -8,6 +8,7 @@ import (
 	"github.com/dauid64/super_chat_backend/src/config"
 	"github.com/dauid64/super_chat_backend/src/database"
 	"github.com/dauid64/super_chat_backend/src/router"
+	"github.com/dauid64/super_chat_backend/src/websocket"
 	"github.com/rs/cors"
 )
 
@@ -18,6 +19,8 @@ func main() {
 	database.Migrate()
 
 	r := router.Generate()
+	r = websocket.Generate(r)
+
 
 	cors := cors.New(cors.Options{
         AllowedOrigins:   []string{config.FrontEndUrl},
