@@ -1,4 +1,4 @@
-package models
+package websockets
 
 import (
 	"bytes"
@@ -91,19 +91,27 @@ func (c *Client) writePump(r *http.Request) {
 				return
 			}
 
-			messageObj := models.Message{
+			NewmessageObj := models.Message{
 				Text:       string(message),
 				ToUserID:   uint(toUserID),
 				FromUserID: uint(userID),
 			}
 
-			record := database.Instance.Create(&messageObj)
+			record := database.Instance.Create(&NewmessageObj)
 			if record.Error != nil {
 				log.Println(record.Error)
 				return
 			}
 
-			responseMessage, err := json.Marshal(messageObj)
+			var messageSend models.Message
+
+			record = database.Instance.Joins("ToUser").Joins("FromUser").Where("messages.id = ?", NewmessageObj.ID).Find(&messageSend)
+			if record.Error != nil {
+				log.Println(record.Error)
+				return
+			}
+
+			responseMessage, err := json.Marshal(messageSend)
 			if err != nil {
 				log.Println(err)
 				return

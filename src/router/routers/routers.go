@@ -4,7 +4,8 @@ import (
 	"net/http"
 
 	"github.com/dauid64/super_chat_backend/src/middlewares"
-	"github.com/dauid64/super_chat_backend/src/websockets"
+	"github.com/dauid64/super_chat_backend/src/websocket/websockets"
+
 	"github.com/gorilla/mux"
 )
 
@@ -29,7 +30,7 @@ func Configurate(r *mux.Router) *mux.Router {
 		}
 	}
 
-	hubs := make( map[string]*models.Hub )
+	hubs := make( map[string]*websockets.Hub )
 
 	r.HandleFunc("/ws/chat/{fromUserID}/{toUserID}", func(w http.ResponseWriter, r *http.Request) {
 		params := mux.Vars(r)
@@ -38,12 +39,12 @@ func Configurate(r *mux.Router) *mux.Router {
 
 		hub, ok := hubs[toUserID]
 		if !ok {
-			hubs[toUserID] = models.NewHub()
+			hubs[toUserID] = websockets.NewHub()
 			hub = hubs[toUserID]
 			hub.Run()
 		}
 
-		models.ServeWs(hub, w, r)
+		websockets.ServeWs(hub, w, r)
 	})
 
 	return r

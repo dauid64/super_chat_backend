@@ -83,7 +83,7 @@ func RecoverUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var user models.User
-	record := database.Instance.Select("created_at", "email").First(&user, "id = ?", userIDInToken)
+	record := database.Instance.Select("id", "created_at", "email").First(&user, "id = ?", userIDInToken)
 	if record.Error != nil {
 		responses.Erro(w, http.StatusInternalServerError, record.Error)
 		return

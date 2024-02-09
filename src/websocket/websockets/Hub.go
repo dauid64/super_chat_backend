@@ -1,8 +1,4 @@
-package models
-
-import (
-	"log"
-)
+package websockets
 
 type Hub struct {
 	clients map[*Client]bool
@@ -31,8 +27,6 @@ func (h *Hub) Run() {
 				close(client.send)
 			}
 		case message := <-h.broadcast:
-			log.Println(string(message))
-
 			for client := range h.clients {
 				select {
 				case client.send <- message:
