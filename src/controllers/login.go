@@ -29,13 +29,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	var userSavedDataBase models.User
 	record := database.Instance.Where("email = ?", user.Email).First(&userSavedDataBase)
 	if record.Error != nil {
-		responses.Erro(w, http.StatusInternalServerError, errors.New("Credenciais Inválidas"))
+		responses.Erro(w, http.StatusInternalServerError, errors.New("credenciais inválidas"))
 		return
 	}
 
 	err = security.CheckPassword(user.Password, userSavedDataBase.Password)
 	if err != nil {
-		responses.Erro(w, http.StatusUnauthorized, err)
+		responses.Erro(w, http.StatusUnauthorized, errors.New("credenciais inválidas"))
 		return
 	}
 

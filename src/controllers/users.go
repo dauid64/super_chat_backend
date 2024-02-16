@@ -77,10 +77,10 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	result := database.Instance.Create(&user)
 	if result.Error != nil {
 		if result.Error == gorm.ErrDuplicatedKey {
-			responses.Erro(w, http.StatusInternalServerError, errors.New("E-mail já cadastrado!"))
+			responses.Erro(w, http.StatusInternalServerError, errors.New("e-mail já cadastrado"))
 			return
 		} else {
-			responses.Erro(w, http.StatusInternalServerError, errors.New("Erro Desconhecido!"))
+			responses.Erro(w, http.StatusInternalServerError, errors.New("erro desconhecido"))
 			return
 		}
 	}
