@@ -29,7 +29,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	var userSavedDataBase models.User
 	record := database.Instance.Where("email = ?", user.Email).First(&userSavedDataBase)
 	if record.Error != nil {
-		responses.JSON(w, http.StatusInternalServerError, errors.New("Credenciais Inválidas"))
+		responses.Erro(w, http.StatusInternalServerError, errors.New("Credenciais Inválidas"))
 		return
 	}
 

@@ -14,7 +14,7 @@ var dbError error
 
 // Conectar abre a conexão com o banco de dados e a retorna
 func Conect() {
-	Instance, dbError = gorm.Open(postgres.Open(config.DataBaseSourceName), &gorm.Config{})
+	Instance, dbError = gorm.Open(postgres.Open(config.DataBaseSourceName), &gorm.Config{TranslateError: true})
 	if dbError != nil {
 		log.Fatal(dbError)
 	}

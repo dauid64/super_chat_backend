@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -10,14 +12,21 @@ import (
 	"github.com/dauid64/super_chat_backend/src/database"
 	"github.com/dauid64/super_chat_backend/src/models"
 	"github.com/gorilla/mux"
+	"gorm.io/gorm"
 
 	"github.com/dauid64/super_chat_backend/src/responses"
 )
 
 func SearchUsers(w http.ResponseWriter, r *http.Request) {
+	userID, err := authetication.ExtractUserID(r)
+	if err != nil {
+		responses.Erro(w, http.StatusUnauthorized, err)
+		return
+	}
+
 	var users []models.User
 
-	record := database.Instance.Find(&users)
+	record := database.Instance.Where("id != ?", userID).Find(&users)
 	if record.Error != nil {
 		responses.Erro(w, http.StatusInternalServerError, record.Error)
 		return
@@ -66,10 +75,15 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	record := database.Instance.Create(&user)
-	if record.Error != nil {
-		responses.Erro(w, http.StatusInternalServerError, record.Error)
-		return
+	result := database.Instance.Create(&user)
+	if result.Error != nil {
+		if result.Error == gorm.ErrDuplicatedKey {
+			responses.Erro(w, http.StatusInternalServerError, errors.New("E-mail já cadastrado!"))
+			return
+		} else {
+			responses.Erro(w, http.StatusInternalServerError, errors.New("Erro Desconhecido!"))
+			return
+		}
 	}
 
 	responses.JSON(w, http.StatusCreated, user)
