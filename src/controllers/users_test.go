@@ -2,12 +2,15 @@ package controllers
 
 import (
 	"bytes"
+	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"regexp"
 	"testing"
 
 	"github.com/dauid64/super_chat_backend/src/database"
+	"github.com/dauid64/super_chat_backend/src/models"
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
 
@@ -51,5 +54,23 @@ func TestCreateUserCorrect(t *testing.T) {
 
 	if http.StatusCreated != rr.Code {
 		t.Errorf("Status code inesperado %d", rr.Code)
+	}
+
+	response := rr.Result()
+	defer response.Body.Close()
+
+	data, err := io.ReadAll(response.Body)
+	if err != nil {
+		t.Errorf("Erro ao ler resposta do servidor (%s)", err)
+	}
+
+	var userResponse models.User
+	err = json.Unmarshal(data, &userResponse)
+	if err != nil {
+		t.Errorf("Erro ao converter corpo da resposta (%s)", err)
+	}
+
+	if userResponse.ID != 1 || userResponse.Email != "test@gmail.com" {
+		t.Errorf("Resposta inesperada (%+v)", userResponse)
 	}
 }

@@ -9,7 +9,6 @@ import (
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 var Instance *gorm.DB
@@ -38,9 +37,7 @@ func DbMock(t *testing.T) sqlmock.Sqlmock {
 
 	gormdb, err := gorm.Open(postgres.New(postgres.Config{
 		Conn: sqldb,
-	}), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
-	})
+	}))
 
 	if err != nil {
 		t.Fatal(err)
