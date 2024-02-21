@@ -29,7 +29,7 @@ func Migrate() {
 	log.Println("Database Migrations Completed!")
 }
 
-func DbMock(t *testing.T) sqlmock.Sqlmock {
+func DbMock(t *testing.T) (sqlmock.Sqlmock, *gorm.DB) {
 	sqldb, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatal(err)
@@ -45,5 +45,5 @@ func DbMock(t *testing.T) sqlmock.Sqlmock {
 
 	Instance = gormdb
 
-	return mock
+	return mock, gormdb
 }

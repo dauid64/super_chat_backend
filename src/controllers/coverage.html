@@ -59,7 +59,7 @@
 				
 				<option value="file1">github.com/dauid64/super_chat_backend/src/controllers/messages.go (0.0%)</option>
 				
-				<option value="file2">github.com/dauid64/super_chat_backend/src/controllers/users.go (23.1%)</option>
+				<option value="file2">github.com/dauid64/super_chat_backend/src/controllers/users.go (28.8%)</option>
 				
 				</select>
 			</div>
@@ -278,11 +278,11 @@ func CreateUser(w http.ResponseWriter, r *http.Request) <span class="cov8" title
         }</span>
 
         <span class="cov8" title="1">result := database.Instance.Create(&amp;user)
-        if result.Error != nil </span><span class="cov0" title="0">{
+        if result.Error != nil </span><span class="cov8" title="1">{
                 if result.Error == gorm.ErrDuplicatedKey </span><span class="cov0" title="0">{
                         responses.Erro(w, http.StatusInternalServerError, errors.New("e-mail já cadastrado"))
                         return
-                }</span> else<span class="cov0" title="0"> {
+                }</span> else<span class="cov8" title="1"> {
                         responses.Erro(w, http.StatusInternalServerError, errors.New("erro desconhecido"))
                         return
                 }</span>
