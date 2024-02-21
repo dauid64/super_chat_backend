@@ -4,7 +4,10 @@ go 1.21.6
 
 require github.com/lib/pq v1.10.9
 
-require golang.org/x/net v0.17.0 // indirect
+require (
+	golang.org/x/net v0.17.0 // indirect
+	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0 // indirect
+)
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
