@@ -41,11 +41,11 @@ github.com/dauid64/super_chat_backend/src/controllers/users.go:59.16,62.3 2 0
 github.com/dauid64/super_chat_backend/src/controllers/users.go:64.2,66.16 3 1
 github.com/dauid64/super_chat_backend/src/controllers/users.go:66.16,69.3 2 1
 github.com/dauid64/super_chat_backend/src/controllers/users.go:71.2,72.16 2 1
-github.com/dauid64/super_chat_backend/src/controllers/users.go:72.16,75.3 2 0
+github.com/dauid64/super_chat_backend/src/controllers/users.go:72.16,75.3 2 1
 github.com/dauid64/super_chat_backend/src/controllers/users.go:77.2,78.25 2 1
 github.com/dauid64/super_chat_backend/src/controllers/users.go:78.25,79.44 1 1
-github.com/dauid64/super_chat_backend/src/controllers/users.go:79.44,82.4 2 0
-github.com/dauid64/super_chat_backend/src/controllers/users.go:82.9,85.4 2 1
+github.com/dauid64/super_chat_backend/src/controllers/users.go:79.44,82.4 2 1
+github.com/dauid64/super_chat_backend/src/controllers/users.go:82.9,85.4 2 0
 github.com/dauid64/super_chat_backend/src/controllers/users.go:88.2,88.45 1 1
 github.com/dauid64/super_chat_backend/src/controllers/users.go:91.58,93.17 2 0
 github.com/dauid64/super_chat_backend/src/controllers/users.go:93.17,96.3 2 0

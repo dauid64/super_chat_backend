@@ -144,3 +144,80 @@ func TestCreateUserWithExistEmail(t *testing.T) {
 		t.Errorf("Resposta inesperada (%s)", responseBody.Erro)
 	}
 }
+
+
+func TestCreateUserWithEmailNull(t *testing.T) {
+	userForCreate := models.User{
+		Email: "",
+		Password: "123456",
+	}
+	userForCreateJson, err := json.Marshal(userForCreate)
+	if err != nil {
+		t.Errorf("Erro ao codificar usuário para JSON")
+	}
+
+	rr := httptest.NewRecorder()
+	req := httptest.NewRequest(
+		http.MethodPost,
+		"/usuarios",
+		bytes.NewBuffer(userForCreateJson),
+	)
+
+	CreateUser(rr, req)
+
+	response := rr.Result()
+	defer response.Body.Close()
+
+	data, err := io.ReadAll(response.Body)
+	if err != nil {
+		t.Errorf("Erro ao ler resposta do servidor (%s)", err)
+	}
+
+	var responseBody ResponseBody
+	err = json.Unmarshal(data, &responseBody)
+	if err != nil {
+		t.Errorf("Erro ao converter corpo da resposta (%s)", err)
+	}
+
+	if responseBody.Erro != "O e-mail é obrigatório e não pode estar em branco" {
+		t.Errorf("Resposta inesperada (%s)", responseBody.Erro)
+	}
+}
+
+func TestCreateUserWithPasswordNull(t *testing.T) {
+	userForCreate := models.User{
+		Email: "test@gmail.com",
+		Password: "",
+	}
+	userForCreateJson, err := json.Marshal(userForCreate)
+	if err != nil {
+		t.Errorf("Erro ao codificar usuário para JSON")
+	}
+
+	rr := httptest.NewRecorder()
+	req := httptest.NewRequest(
+		http.MethodPost,
+		"/usuarios",
+		bytes.NewBuffer(userForCreateJson),
+	)
+
+	CreateUser(rr, req)
+
+	response := rr.Result()
+	defer response.Body.Close()
+
+	data, err := io.ReadAll(response.Body)
+	if err != nil {
+		t.Errorf("Erro ao ler resposta do servidor (%s)", err)
+	}
+
+	var responseBody ResponseBody
+	err = json.Unmarshal(data, &responseBody)
+	if err != nil {
+		t.Errorf("Erro ao converter corpo da resposta (%s)", err)
+	}
+
+	if responseBody.Erro != "a senha é obrigatório e não pode estar em branco" {
+		t.Errorf("Resposta inesperada (%s)", responseBody.Erro)
+	}
+}
