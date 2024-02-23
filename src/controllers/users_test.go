@@ -3,12 +3,14 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"regexp"
 	"testing"
 
+	"github.com/dauid64/super_chat_backend/src/authetication"
 	"github.com/dauid64/super_chat_backend/src/database"
 	"github.com/dauid64/super_chat_backend/src/models"
 	"github.com/dauid64/super_chat_backend/src/security"
@@ -145,10 +147,9 @@ func TestCreateUserWithExistEmail(t *testing.T) {
 	}
 }
 
-
 func TestCreateUserWithEmailNull(t *testing.T) {
 	userForCreate := models.User{
-		Email: "",
+		Email:    "",
 		Password: "123456",
 	}
 	userForCreateJson, err := json.Marshal(userForCreate)
@@ -186,7 +187,7 @@ func TestCreateUserWithEmailNull(t *testing.T) {
 
 func TestCreateUserWithPasswordNull(t *testing.T) {
 	userForCreate := models.User{
-		Email: "test@gmail.com",
+		Email:    "test@gmail.com",
 		Password: "",
 	}
 	userForCreateJson, err := json.Marshal(userForCreate)
@@ -219,5 +220,87 @@ func TestCreateUserWithPasswordNull(t *testing.T) {
 
 	if responseBody.Erro != "a senha é obrigatório e não pode estar em branco" {
 		t.Errorf("Resposta inesperada (%s)", responseBody.Erro)
+	}
+}
+
+func TestSearchUserCorrect(t *testing.T) {
+	mock, gormdb := database.DbMock(t)
+
+	userPassword, err := security.Hash("12345678")
+	if err != nil {
+		t.Errorf("Erro ao gerar senha (%s)", err)
+	}
+
+	userFind := models.User{
+		Email:    "test@gmail.com",
+		Password: string(userPassword),
+	}
+
+	rowsInsert := sqlmock.NewRows([]string{"id"}).AddRow(1)
+	mock.ExpectBegin()
+	mock.ExpectQuery(`INSERT INTO "users" (.+) VALUES (.+)`).WillReturnRows(rowsInsert)
+	mock.ExpectCommit()
+
+	result := gormdb.Create(&userFind)
+	if result.Error != nil {
+		t.Errorf("ocorreu um erro ao criar o usuário (%s)", result.Error)
+	}
+
+	token, err := authetication.CreateToken(1)
+	if err != nil {
+		t.Errorf("Erro ao gerar token (%s)", err)
+	}
+
+	rr := httptest.NewRecorder()
+	req := httptest.NewRequest(
+		http.MethodGet,
+		"/usuarios",
+		nil,
+	)
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
+
+	rowsSelect := sqlmock.NewRows([]string{"id", "email", "password"}).
+		AddRow(1, "test@gmail.com", string(userPassword))
+
+	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE id != $1 AND "users"."deleted_at" IS NULL`)).WithArgs(1).WillReturnRows(rowsSelect)
+
+	SearchUsers(rr, req)
+
+	if http.StatusOK != rr.Code {
+		t.Errorf("Status code inesperado %d", rr.Code)
+	}
+
+	response := rr.Result()
+	defer response.Body.Close()
+
+	data, err := io.ReadAll(response.Body)
+	if err != nil {
+		t.Errorf("Erro ao ler resposta do servidor (%s)", err)
+	}
+
+	var userResponse []models.User
+	err = json.Unmarshal(data, &userResponse)
+	if err != nil {
+		t.Errorf("Erro ao converter corpo da resposta (%s)", err)
+	}
+
+	if userFind.ID != userResponse[0].ID {
+		t.Errorf("Resposta inesperada (%s)", string(data))
+	}
+}
+
+func TestSearchUserUnauthorized(t *testing.T) {
+	rr := httptest.NewRecorder()
+	req := httptest.NewRequest(
+		http.MethodGet,
+		"/usuarios",
+		nil,
+	)
+	req.Header.Add("Authorization", "Bearer token_invalido")
+
+	SearchUsers(rr, req)
+
+	if http.StatusUnauthorized != rr.Code {
+		t.Errorf("Status code inesperado %d", rr.Code)
 	}
 }

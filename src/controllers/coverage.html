@@ -59,7 +59,7 @@
 				
 				<option value="file1">github.com/dauid64/super_chat_backend/src/controllers/messages.go (0.0%)</option>
 				
-				<option value="file2">github.com/dauid64/super_chat_backend/src/controllers/users.go (32.7%)</option>
+				<option value="file2">github.com/dauid64/super_chat_backend/src/controllers/users.go (48.1%)</option>
 				
 				</select>
 			</div>
@@ -219,14 +219,14 @@ import (
         "github.com/dauid64/super_chat_backend/src/responses"
 )
 
-func SearchUsers(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+func SearchUsers(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
         userID, err := authetication.ExtractUserID(r)
-        if err != nil </span><span class="cov0" title="0">{
+        if err != nil </span><span class="cov8" title="1">{
                 responses.Erro(w, http.StatusUnauthorized, err)
                 return
         }</span>
 
-        <span class="cov0" title="0">var users []models.User
+        <span class="cov8" title="1">var users []models.User
 
         record := database.Instance.Where("id != ?", userID).Find(&amp;users)
         if record.Error != nil </span><span class="cov0" title="0">{
@@ -234,7 +234,7 @@ func SearchUsers(w http.ResponseWriter, r *http.Request) <span class="cov0" titl
                 return
         }</span>
 
-        <span class="cov0" title="0">responses.JSON(w, http.StatusOK, users)</span>
+        <span class="cov8" title="1">responses.JSON(w, http.StatusOK, users)</span>
 }
 
 func SearchIDUsers(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
